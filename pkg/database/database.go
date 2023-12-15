@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -79,11 +78,6 @@ type Migrate interface {
 }
 
 func (d *Database) Migrate(migration ...Migrate) {
-	tx, err := d.Begin()
-	if err != nil {
-		d.log.Fatal().Err(err).Msg("failed to begin transaction")
-	}
-
 	schemas := make([]string, len(migration))
 	for i, m := range migration {
 		schemas[i] = m.Migration()
@@ -94,28 +88,12 @@ func (d *Database) Migrate(migration ...Migrate) {
 			d.log.Warn().Err(err).Msg("failed to migrate")
 		}
 	}
-
-	if err := d.Commit(tx); err != nil {
-		d.Rollback(tx)
-		d.log.Fatal().Err(err).Msg("failed to commit transaction")
-	}
 }
 
 func (d *Database) Seeder(seeds []Seed) {
-	tx, err := d.Begin()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for _, seed := range seeds {
 		if _, err := d.DB.NamedExec(seed.Schema, seed.Data); err != nil {
-			d.Rollback(tx)
-			log.Fatal(err)
+			d.log.Fatal().Err(err).Msg("failed to seed")
 		}
-	}
-
-	if err := d.Commit(tx); err != nil {
-		d.Rollback(tx)
-		log.Fatal(err)
 	}
 }
