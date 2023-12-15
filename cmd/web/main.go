@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gofiber/contrib/fiberzerolog"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/rs/zerolog"
 	"go.uber.org/fx"
 
 	"github.com/nugrhrizki/buzz/cmd/web/routes"
@@ -40,6 +41,7 @@ func server(
 	users *whatsapp_user.Repository,
 	user *user.Repository,
 	role *role.Repository,
+	log *zerolog.Logger,
 ) *fiber.App {
 	db.Migrate(users, role, user)
 
@@ -50,9 +52,8 @@ func server(
 	defer app.Shutdown()
 
 	app.Use(recover.New())
-	app.Use(logger.New(logger.Config{
-		TimeZone:   "Asia/Jakarta",
-		TimeFormat: "02-Jan-2006 15:04:05",
+	app.Use(fiberzerolog.New(fiberzerolog.Config{
+		Logger: log,
 	}))
 
 	router.Setup(app)
