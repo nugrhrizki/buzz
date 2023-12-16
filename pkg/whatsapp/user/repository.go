@@ -1,4 +1,4 @@
-package whatsapp_user
+package user
 
 import (
 	"database/sql"
@@ -21,7 +21,7 @@ func (r *Repository) Migration() string {
 	return New()
 }
 
-func (r *Repository) CreateUser(user *WhatsappUser) error {
+func (r *Repository) CreateUser(user *User) error {
 	_, err := r.GetUserByToken(user.Token)
 
 	switch err {
@@ -44,8 +44,8 @@ func (r *Repository) CreateUser(user *WhatsappUser) error {
 	return nil
 }
 
-func (r *Repository) GetConnectedUser() ([]WhatsappUser, error) {
-	var users []WhatsappUser
+func (r *Repository) GetConnectedUser() ([]User, error) {
+	var users []User
 	err := r.db.Select(
 		&users,
 		"SELECT * FROM whatsapp_users WHERE connected = 1",
@@ -56,8 +56,8 @@ func (r *Repository) GetConnectedUser() ([]WhatsappUser, error) {
 	return users, nil
 }
 
-func (r *Repository) GetUsers() ([]WhatsappUser, error) {
-	var users []WhatsappUser
+func (r *Repository) GetUsers() ([]User, error) {
+	var users []User
 	err := r.db.Select(
 		&users,
 		"SELECT * FROM whatsapp_users",
@@ -69,8 +69,8 @@ func (r *Repository) GetUsers() ([]WhatsappUser, error) {
 	return users, nil
 }
 
-func (r *Repository) GetUserById(id int) (*WhatsappUser, error) {
-	var user WhatsappUser
+func (r *Repository) GetUserById(id int) (*User, error) {
+	var user User
 	err := r.db.Get(
 		&user,
 		"SELECT * FROM whatsapp_users WHERE id = ?",
@@ -82,8 +82,8 @@ func (r *Repository) GetUserById(id int) (*WhatsappUser, error) {
 	return &user, nil
 }
 
-func (r *Repository) GetUserByJid(jid string) (*WhatsappUser, error) {
-	var user WhatsappUser
+func (r *Repository) GetUserByJid(jid string) (*User, error) {
+	var user User
 	err := r.db.Get(
 		&user,
 		"SELECT * FROM whatsapp_users WHERE jid = ?",
@@ -94,8 +94,8 @@ func (r *Repository) GetUserByJid(jid string) (*WhatsappUser, error) {
 	return &user, nil
 }
 
-func (r *Repository) GetUserByToken(token string) (*WhatsappUser, error) {
-	var user WhatsappUser
+func (r *Repository) GetUserByToken(token string) (*User, error) {
+	var user User
 	err := r.db.Get(
 		&user,
 		"SELECT * FROM whatsapp_users WHERE token = ?",

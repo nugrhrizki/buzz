@@ -13,18 +13,20 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/nugrhrizki/buzz/cmd/web/routes"
-	"github.com/nugrhrizki/buzz/internal/role"
-	"github.com/nugrhrizki/buzz/internal/user"
+
 	"github.com/nugrhrizki/buzz/pkg/database"
 	"github.com/nugrhrizki/buzz/pkg/env"
 	"github.com/nugrhrizki/buzz/pkg/log"
 	"github.com/nugrhrizki/buzz/pkg/whatsapp"
-	"github.com/nugrhrizki/buzz/pkg/whatsapp/api"
-	"github.com/nugrhrizki/buzz/pkg/whatsapp/whatsapp_user"
+	whatsappApi "github.com/nugrhrizki/buzz/pkg/whatsapp/api"
+	whatsappUser "github.com/nugrhrizki/buzz/pkg/whatsapp/user"
 
 	roleHandler "github.com/nugrhrizki/buzz/internal/api/role"
 	userHandler "github.com/nugrhrizki/buzz/internal/api/user"
 	whatsappHandler "github.com/nugrhrizki/buzz/internal/api/whatsapp"
+
+	"github.com/nugrhrizki/buzz/internal/role"
+	"github.com/nugrhrizki/buzz/internal/user"
 )
 
 var (
@@ -38,7 +40,7 @@ func server(
 	router *routes.Router,
 	db *database.Database,
 	whatsapp *whatsapp.Whatsapp,
-	users *whatsapp_user.Repository,
+	users *whatsappUser.Repository,
 	user *user.Repository,
 	role *role.Repository,
 	log *zerolog.Logger,
@@ -79,18 +81,20 @@ func main() {
 
 	fx.New(
 		fx.Provide(
-			api.New,
-			database.NewDatabase,
-			env.NewEnv,
+			database.New,
+			env.New,
 			log.New,
-			roleHandler.NewRoleApi,
+			routes.New,
+			whatsappApi.New,
+			whatsapp.New,
+
 			role.NewRepository,
-			routes.NewRouter,
-			userHandler.NewUserApi,
 			user.NewRepository,
+			whatsappUser.NewRepository,
+
+			roleHandler.NewRoleApi,
+			userHandler.NewUserApi,
 			whatsappHandler.NewWhatsappAPI,
-			whatsapp.NewWhatsapp,
-			whatsapp_user.NewRepository,
 		),
 		fx.Invoke(server),
 	).Run()

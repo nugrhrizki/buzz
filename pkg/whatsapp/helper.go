@@ -1,22 +1,33 @@
 package whatsapp
 
 import (
+	"strconv"
 	"strings"
 
-	"github.com/nugrhrizki/buzz/pkg/whatsapp/whatsapp_user"
+	"github.com/nugrhrizki/buzz/pkg/whatsapp/user"
 	"github.com/patrickmn/go-cache"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/types"
 )
 
-// Update entry in User map
-func (w *Whatsapp) UpdateUserInfo(values interface{}, field string, value string) interface{} {
-	w.log.Debug().Str("field", field).Str("value", value).Msg("User info updated")
-	// values.(Values).m[field] = value
-	return values
+func (w *Whatsapp) UserToUserInfo(u *user.User) user.UserInfo {
+	return user.UserInfo{
+		Id:      strconv.Itoa(u.Id),
+		Jid:     u.Jid,
+		Webhook: u.Webhook,
+		Token:   u.Token,
+		Events:  u.Events,
+	}
 }
 
-func (w *Whatsapp) UpdateCacheUserInfo(token string, value whatsapp_user.WhatsappUserInfo) {
+func (w *Whatsapp) GetCacheUserInfo(token string) (user.UserInfo, bool) {
+	if x, found := w.userInfoCache.Get(token); found {
+		return x.(user.UserInfo), true
+	}
+	return user.UserInfo{}, false
+}
+
+func (w *Whatsapp) UpdateCacheUserInfo(token string, value user.UserInfo) {
 	w.userInfoCache.Set(token, value, cache.NoExpiration)
 }
 

@@ -19,7 +19,7 @@ type Seed struct {
 	Data   interface{}
 }
 
-func NewDatabase(env *env.Env, log *zerolog.Logger) *Database {
+func New(env *env.Env, log *zerolog.Logger) *Database {
 	db, err := sqlx.Connect(
 		env.GetDBDriver(),
 		env.GetDBDSN(),

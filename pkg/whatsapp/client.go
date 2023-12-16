@@ -11,7 +11,7 @@ import (
 	"sync/atomic"
 
 	"github.com/nugrhrizki/buzz/pkg/utils"
-	"github.com/nugrhrizki/buzz/pkg/whatsapp/whatsapp_user"
+	"github.com/nugrhrizki/buzz/pkg/whatsapp/user"
 	"github.com/patrickmn/go-cache"
 	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/appstate"
@@ -122,10 +122,16 @@ func (c *Client) EventHandler(rawEvt interface{}) {
 		if !found {
 			c.whatsapp.log.Warn().Msg("No user info cached on pairing?")
 		} else {
-			txtid := userInfo.(whatsapp_user.WhatsappUserInfo).Id
-			token := userInfo.(whatsapp_user.WhatsappUserInfo).Token
-			v := c.whatsapp.UpdateUserInfo(userInfo, "Jid", jid.String())
-			c.whatsapp.userInfoCache.Set(token, v, cache.NoExpiration)
+			txtid := userInfo.(user.UserInfo).Id
+			token := userInfo.(user.UserInfo).Token
+			newUserInfo := user.UserInfo{
+				Id:      txtid,
+				Jid:     jid.String(),
+				Webhook: userInfo.(user.UserInfo).Webhook,
+				Token:   token,
+				Events:  userInfo.(user.UserInfo).Events,
+			}
+			c.whatsapp.userInfoCache.Set(token, newUserInfo, cache.NoExpiration)
 			c.whatsapp.log.Info().Str("jid", jid.String()).Str("userid", txtid).Str("token", token).Msg("User information set")
 		}
 	case *events.StreamReplaced:
@@ -346,7 +352,7 @@ func (c *Client) EventHandler(rawEvt interface{}) {
 				Str("token", c.token).
 				Msg("Could not call webhook as there is no user for this token")
 		} else {
-			webhookurl = userInfo.(whatsapp_user.WhatsappUserInfo).Webhook
+			webhookurl = userInfo.(user.UserInfo).Webhook
 		}
 
 		if !utils.Find(c.subscriptions, postmap["type"].(string)) &&

@@ -15,7 +15,7 @@ type Router struct {
 	role     *role.RoleApi
 }
 
-func NewRouter(
+func New(
 	whatsapp *whatsapp.WhatsappAPI,
 	user *user.UserApi,
 	role *role.RoleApi,
@@ -36,7 +36,7 @@ func (r *Router) Setup(app *fiber.App) {
 	v1 := api.Group("/v1")
 
 	v1.Post("/whatsapp/create-user", r.whatsapp.CreateUser)
-	whatsapp := v1.Group("/whatsapp")
+	whatsapp := v1.Group("/whatsapp", r.whatsapp.UserInfo)
 	whatsapp.Post("/connect", r.whatsapp.Connect)
 	whatsapp.Post("/disconnect", r.whatsapp.Disconnect)
 	whatsapp.Get("/webhook", r.whatsapp.GetWebhook)

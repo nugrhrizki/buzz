@@ -17,7 +17,7 @@ import (
 
 	"github.com/nugrhrizki/buzz/pkg/utils"
 	"github.com/nugrhrizki/buzz/pkg/whatsapp"
-	"github.com/nugrhrizki/buzz/pkg/whatsapp/whatsapp_user"
+	"github.com/nugrhrizki/buzz/pkg/whatsapp/user"
 	"github.com/rs/zerolog"
 	"github.com/vincent-petithory/dataurl"
 )
@@ -25,7 +25,7 @@ import (
 type Api struct {
 	log      *zerolog.Logger
 	whatsapp *whatsapp.Whatsapp
-	users    *whatsapp_user.Repository
+	users    *user.Repository
 }
 
 func New(
@@ -33,7 +33,7 @@ func New(
 
 	whatsapp *whatsapp.Whatsapp,
 
-	users *whatsapp_user.Repository,
+	users *user.Repository,
 ) *Api {
 	return &Api{
 		log:      log,
@@ -42,8 +42,8 @@ func New(
 	}
 }
 
-func (a *Api) CreateUser(payload *whatsapp_user.WhatsappUser) (*whatsapp_user.WhatsappUser, error) {
-	user := whatsapp_user.WhatsappUser{
+func (a *Api) CreateUser(payload *user.User) (*user.User, error) {
+	user := user.User{
 		Name:  payload.Name,
 		Token: payload.Token,
 	}
@@ -55,7 +55,7 @@ func (a *Api) CreateUser(payload *whatsapp_user.WhatsappUser) (*whatsapp_user.Wh
 	return &user, nil
 }
 
-func (a *Api) Connect(userInfo *whatsapp_user.WhatsappUserInfo, payload *ConnectPayload) error {
+func (a *Api) Connect(userInfo *user.UserInfo, payload *ConnectPayload) error {
 	txtid := userInfo.Id
 	jid := userInfo.Jid
 	token := userInfo.Token
@@ -116,7 +116,7 @@ func (a *Api) Connect(userInfo *whatsapp_user.WhatsappUserInfo, payload *Connect
 	return nil
 }
 
-func (a *Api) Disconnect(userInfo *whatsapp_user.WhatsappUserInfo) error {
+func (a *Api) Disconnect(userInfo *user.UserInfo) error {
 	txtid := userInfo.Id
 	jid := userInfo.Jid
 	token := userInfo.Token
@@ -153,7 +153,7 @@ func (a *Api) Disconnect(userInfo *whatsapp_user.WhatsappUserInfo) error {
 	return nil
 }
 
-func (a *Api) GetWebhook(userInfo *whatsapp_user.WhatsappUserInfo) (*GetWebhookResponse, error) {
+func (a *Api) GetWebhook(userInfo *user.UserInfo) (*GetWebhookResponse, error) {
 	txtid := userInfo.Id
 	userId, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -171,7 +171,7 @@ func (a *Api) GetWebhook(userInfo *whatsapp_user.WhatsappUserInfo) (*GetWebhookR
 	}, nil
 }
 
-func (a *Api) SetWebhook(userInfo *whatsapp_user.WhatsappUserInfo, payload *SetWebhookPayload) error {
+func (a *Api) SetWebhook(userInfo *user.UserInfo, payload *SetWebhookPayload) error {
 	txtid := userInfo.Id
 	token := userInfo.Token
 	userid, err := strconv.Atoi(txtid)
@@ -191,7 +191,7 @@ func (a *Api) SetWebhook(userInfo *whatsapp_user.WhatsappUserInfo, payload *SetW
 	return nil
 }
 
-func (a *Api) GetQR(userInfo *whatsapp_user.WhatsappUserInfo) (string, error) {
+func (a *Api) GetQR(userInfo *user.UserInfo) (string, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -220,7 +220,7 @@ func (a *Api) GetQR(userInfo *whatsapp_user.WhatsappUserInfo) (string, error) {
 	return code, nil
 }
 
-func (a *Api) Logout(userInfo *whatsapp_user.WhatsappUserInfo) error {
+func (a *Api) Logout(userInfo *user.UserInfo) error {
 	txtid := userInfo.Id
 	jid := userInfo.Jid
 	userid, err := strconv.Atoi(txtid)
@@ -253,7 +253,7 @@ func (a *Api) Logout(userInfo *whatsapp_user.WhatsappUserInfo) error {
 	return errors.New("could not disconnect as it was not connected")
 }
 
-func (a *Api) GetStatus(userInfo *whatsapp_user.WhatsappUserInfo) (*GetStatusResponse, error) {
+func (a *Api) GetStatus(userInfo *user.UserInfo) (*GetStatusResponse, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -274,7 +274,7 @@ func (a *Api) GetStatus(userInfo *whatsapp_user.WhatsappUserInfo) (*GetStatusRes
 	}, nil
 }
 
-func (a *Api) SendDocument(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendDocumentPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendDocument(userInfo *user.UserInfo, payload *SendDocumentPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -337,7 +337,7 @@ func (a *Api) SendDocument(userInfo *whatsapp_user.WhatsappUserInfo, payload *Se
 	return client.SendMessage(context.Background(), recipient, msg)
 }
 
-func (a *Api) SendAudio(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendAudioPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendAudio(userInfo *user.UserInfo, payload *SendAudioPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userid, _ := strconv.Atoi(txtid)
 
@@ -401,7 +401,7 @@ func (a *Api) SendAudio(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendA
 	return client.SendMessage(context.Background(), recipient, msg)
 }
 
-func (a *Api) SendImage(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendImagePayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendImage(userInfo *user.UserInfo, payload *SendImagePayload) (whatsmeow.SendResponse, error) {
 
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
@@ -465,7 +465,7 @@ func (a *Api) SendImage(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendI
 	return client.SendMessage(context.Background(), recipient, msg)
 }
 
-func (a *Api) SendSticker(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendStickerPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendSticker(userInfo *user.UserInfo, payload *SendStickerPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -528,7 +528,7 @@ func (a *Api) SendSticker(userInfo *whatsapp_user.WhatsappUserInfo, payload *Sen
 	return client.SendMessage(context.Background(), recipient, msg)
 }
 
-func (a *Api) SendVideo(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendVideoPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendVideo(userInfo *user.UserInfo, payload *SendVideoPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -591,7 +591,7 @@ func (a *Api) SendVideo(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendV
 	return client.SendMessage(context.Background(), recipient, msg)
 }
 
-func (a *Api) SendContact(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendContactPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendContact(userInfo *user.UserInfo, payload *SendContactPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -629,7 +629,7 @@ func (a *Api) SendContact(userInfo *whatsapp_user.WhatsappUserInfo, payload *Sen
 	return client.SendMessage(context.Background(), recipient, msg)
 }
 
-func (a *Api) SendLocation(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendLocationPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendLocation(userInfo *user.UserInfo, payload *SendLocationPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -667,7 +667,7 @@ func (a *Api) SendLocation(userInfo *whatsapp_user.WhatsappUserInfo, payload *Se
 
 	return client.SendMessage(context.Background(), recipient, msg)
 }
-func (a *Api) SendButton(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendButtonTextPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendButton(userInfo *user.UserInfo, payload *SendButtonTextPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -714,7 +714,7 @@ func (a *Api) SendButton(userInfo *whatsapp_user.WhatsappUserInfo, payload *Send
 		},
 	)
 }
-func (a *Api) SendList(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendListPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendList(userInfo *user.UserInfo, payload *SendListPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -777,7 +777,7 @@ func (a *Api) SendList(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendLi
 	)
 }
 
-func (a *Api) SendText(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendTextPayload) (whatsmeow.SendResponse, error) {
+func (a *Api) SendText(userInfo *user.UserInfo, payload *SendTextPayload) (whatsmeow.SendResponse, error) {
 	txtid := userInfo.Id
 	userId, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -816,7 +816,7 @@ func (a *Api) SendText(userInfo *whatsapp_user.WhatsappUserInfo, payload *SendTe
 	return client.SendMessage(context.Background(), recipient, msg)
 }
 
-func (a *Api) CheckUser(userInfo *whatsapp_user.WhatsappUserInfo, payload *CheckUserPayload) (*UserCollection, error) {
+func (a *Api) CheckUser(userInfo *user.UserInfo, payload *CheckUserPayload) (*UserCollection, error) {
 	userid, err := strconv.Atoi(userInfo.Id)
 	if err != nil {
 		return nil, err
@@ -846,7 +846,7 @@ func (a *Api) CheckUser(userInfo *whatsapp_user.WhatsappUserInfo, payload *Check
 	return uc, nil
 }
 
-func (a *Api) GetUser(userInfo *whatsapp_user.WhatsappUserInfo, payload CheckUserPayload) (*UserInfoCollection, error) {
+func (a *Api) GetUser(userInfo *user.UserInfo, payload CheckUserPayload) (*UserInfoCollection, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -884,7 +884,7 @@ func (a *Api) GetUser(userInfo *whatsapp_user.WhatsappUserInfo, payload CheckUse
 	return uc, nil
 }
 
-func (a *Api) GetAvatar(userInfo *whatsapp_user.WhatsappUserInfo, getAvatar *GetAvatarPayload) (*types.ProfilePictureInfo, error) {
+func (a *Api) GetAvatar(userInfo *user.UserInfo, getAvatar *GetAvatarPayload) (*types.ProfilePictureInfo, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -926,7 +926,7 @@ func (a *Api) GetAvatar(userInfo *whatsapp_user.WhatsappUserInfo, getAvatar *Get
 	return pic, nil
 }
 
-func (a *Api) GetContacts(userInfo *whatsapp_user.WhatsappUserInfo) ([]byte, error) {
+func (a *Api) GetContacts(userInfo *user.UserInfo) ([]byte, error) {
 	txtid := userInfo.Id
 	userid, err := strconv.Atoi(txtid)
 	if err != nil {
@@ -951,7 +951,7 @@ func (a *Api) GetContacts(userInfo *whatsapp_user.WhatsappUserInfo) ([]byte, err
 	return json, nil
 }
 
-func (a *Api) SendChatPresence(userInfo *whatsapp_user.WhatsappUserInfo, payload *ChatPresencePayload) error {
+func (a *Api) SendChatPresence(userInfo *user.UserInfo, payload *ChatPresencePayload) error {
 	txtid := userInfo.Id
 	userId, err := strconv.Atoi(txtid)
 	if err != nil {

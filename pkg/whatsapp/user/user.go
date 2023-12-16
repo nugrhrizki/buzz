@@ -1,6 +1,6 @@
-package whatsapp_user
+package user
 
-type WhatsappUser struct {
+type User struct {
 	Id         int    `db:"id"         json:"id"`
 	Name       string `db:"name"       json:"name"`
 	Token      string `db:"token"      json:"token"`
@@ -12,7 +12,7 @@ type WhatsappUser struct {
 	Events     string `db:"events"     json:"events"`
 }
 
-type WhatsappUserInfo struct {
+type UserInfo struct {
 	Id      string `json:"id"`
 	Jid     string `json:"jid"`
 	Webhook string `json:"webhook"`

@@ -21,7 +21,7 @@ import (
 
 	"github.com/nugrhrizki/buzz/pkg/env"
 	"github.com/nugrhrizki/buzz/pkg/utils"
-	"github.com/nugrhrizki/buzz/pkg/whatsapp/whatsapp_user"
+	"github.com/nugrhrizki/buzz/pkg/whatsapp/user"
 )
 
 type Whatsapp struct {
@@ -33,7 +33,7 @@ type Whatsapp struct {
 	userInfoCache *cache.Cache
 	log           *zerolog.Logger
 
-	users *whatsapp_user.Repository
+	users *user.Repository
 }
 
 var MessageTypes = []string{
@@ -45,8 +45,8 @@ var MessageTypes = []string{
 	"All",
 }
 
-func NewWhatsapp(
-	users *whatsapp_user.Repository,
+func New(
+	users *user.Repository,
 	log *zerolog.Logger,
 	env *env.Env,
 ) *Whatsapp {
@@ -84,7 +84,7 @@ func (w *Whatsapp) ConnectOnStartup() {
 	for _, u := range users {
 		w.log.Info().Str("token", u.Token).Msg("Connect to Whatsapp on startup")
 
-		userInfo := whatsapp_user.WhatsappUserInfo{
+		userInfo := user.UserInfo{
 			Id:      strconv.Itoa(u.Id),
 			Jid:     u.Jid,
 			Webhook: u.Webhook,

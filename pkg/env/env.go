@@ -5,7 +5,7 @@ type Env struct {
 	DB_DSN    string
 }
 
-func NewEnv() *Env {
+func New() *Env {
 	return &Env{
 		DB_DRIVER: "postgres",
 		DB_DSN:    "user=postgres password=postgres dbname=db_whatsapp sslmode=disable",
