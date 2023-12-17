@@ -44,6 +44,7 @@ func (w *Whatsapp) ParseJID(arg string) (types.JID, bool) {
 	phonenumber := ""
 	phonenumber = strings.Split(arg, "@")[0]
 	phonenumber = strings.Split(phonenumber, ".")[0]
+	phonenumber = strings.Split(phonenumber, ":")[0]
 	b := true
 	for _, c := range phonenumber {
 		if c < '0' || c > '9' {
@@ -76,7 +77,7 @@ func (w *Whatsapp) GetClient(userId int) (*whatsmeow.Client, error) {
 	client, ok := w.clientStore[userId]
 
 	if !ok {
-		return nil, ErrClientNotFound
+		return nil, ErrNoSession
 	}
 
 	if client == nil {

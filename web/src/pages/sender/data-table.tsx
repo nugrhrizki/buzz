@@ -10,17 +10,16 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
 } from "@tanstack/solid-table";
-import { Match, Switch, createSignal } from "solid-js";
+import { Match, ParentProps, Show, Switch, createSignal } from "solid-js";
 
-import { Client } from "@/models/client";
+import { Sender } from "@/models/sender";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import DataTable from "@/components/ui/data-table";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
-type ColumnDefiniton = ColumnDef<Client>;
+type ColumnDefiniton = ColumnDef<Sender>;
 
 export const columns: ColumnDefiniton[] = [
   DataTable.RowExpand(),
@@ -37,7 +36,7 @@ export const columns: ColumnDefiniton[] = [
     accessorKey: "connected",
     header: (header) => <DataTable.ColumnHeader column={header.column} title="Status" />,
     cell: (cell) => (
-      <Switch fallback={<Badge variant="secondary">-</Badge>}>
+      <Switch fallback={<Badge variant="secondary">inactive</Badge>}>
         <Match when={cell.row.original.connected === 1}>
           <Badge variant="default">connected</Badge>
         </Match>
@@ -49,7 +48,7 @@ export const columns: ColumnDefiniton[] = [
   },
 ];
 
-export function createClientTable(data: Client[], columns: ColumnDefiniton[]) {
+export function createSenderTable(data: Sender[], columns: ColumnDefiniton[]) {
   const [sorting, setSorting] = createSignal<SortingState>([]);
   const [columnFilters, setColumnFilters] = createSignal<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = createSignal<VisibilityState>({});
@@ -85,11 +84,49 @@ export function createClientTable(data: Client[], columns: ColumnDefiniton[]) {
   });
 }
 
-interface TableDetailProps {
-  client: Client;
+export function createContactsTable<T>(data: T[], columns: ColumnDef<T>[]) {
+  const [sorting, setSorting] = createSignal<SortingState>([]);
+  const [columnFilters, setColumnFilters] = createSignal<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = createSignal<VisibilityState>({
+    jid: false,
+  });
+  const [rowSelection, setRowSelection] = createSignal({});
+
+  return createSolidTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getRowCanExpand: () => true,
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      get sorting() {
+        return sorting();
+      },
+      get columnFilters() {
+        return columnFilters();
+      },
+      get columnVisibility() {
+        return columnVisibility();
+      },
+      get rowSelection() {
+        return rowSelection();
+      },
+    },
+  });
 }
 
-export function TableDetail(props: TableDetailProps) {
+interface TableDetailProps {
+  sender: Sender;
+}
+
+export function TableDetail(props: ParentProps<TableDetailProps>) {
   return (
     <div class="p-4">
       <Card>
@@ -99,32 +136,32 @@ export function TableDetail(props: TableDetailProps) {
               <TableRow>
                 <TableCell class="w-[1%] whitespace-nowrap">ID</TableCell>
                 <TableCell class="w-[1%] whitespace-nowrap">:</TableCell>
-                <TableCell>{props.client.id || "-"}</TableCell>
+                <TableCell>{props.sender.id || "-"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell class="w-[1%] whitespace-nowrap">JID</TableCell>
                 <TableCell class="w-[1%] whitespace-nowrap">:</TableCell>
-                <TableCell>{props.client.jid || "-"}</TableCell>
+                <TableCell>{props.sender.jid || "-"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell class="w-[1%] whitespace-nowrap">Name</TableCell>
                 <TableCell class="w-[1%] whitespace-nowrap">:</TableCell>
-                <TableCell>{props.client.name || "-"}</TableCell>
+                <TableCell>{props.sender.name || "-"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell class="w-[1%] whitespace-nowrap">Token</TableCell>
                 <TableCell class="w-[1%] whitespace-nowrap">:</TableCell>
-                <TableCell>{props.client.token || "-"}</TableCell>
+                <TableCell>{props.sender.token || "-"}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell class="w-[1%] whitespace-nowrap">Status</TableCell>
                 <TableCell class="w-[1%] whitespace-nowrap">:</TableCell>
                 <TableCell>
-                  <Switch fallback={<Badge variant="secondary">-</Badge>}>
-                    <Match when={props.client.connected === 1}>
+                  <Switch fallback={<Badge variant="secondary">inactive</Badge>}>
+                    <Match when={props.sender.connected === 1}>
                       <Badge variant="default">connected</Badge>
                     </Match>
-                    <Match when={props.client.connected === 0}>
+                    <Match when={props.sender.connected === 0}>
                       <Badge variant="destructive">disconnected</Badge>
                     </Match>
                   </Switch>
@@ -134,15 +171,9 @@ export function TableDetail(props: TableDetailProps) {
           </Table>
         </CardContent>
         <CardFooter>
-          <div class="flex justify-end w-full gap-x-4">
-            <Button size="sm">Open</Button>
-            <Button variant="outline" size="sm">
-              Edit
-            </Button>
-            <Button variant="destructive" size="sm">
-              Delete
-            </Button>
-          </div>
+          <Show when={props.children}>
+            <div class="flex justify-end w-full gap-x-4">{props.children}</div>
+          </Show>
         </CardFooter>
       </Card>
     </div>

@@ -69,3 +69,15 @@ export function formatDate(date: Date | string | number) {
     hour12: true,
   });
 }
+
+export function jidToPhoneNumber(jid: string) {
+  let phonenumber = "";
+  phonenumber = jid.split("@")[0];
+  phonenumber = phonenumber.split(".")[0];
+  phonenumber = phonenumber.split(":")[0];
+  if (/^\d+$/.test(phonenumber)) {
+    return phonenumber;
+  }
+
+  return null;
+}

@@ -36,6 +36,10 @@ func (r *Router) Setup(app *fiber.App) {
 	v1 := api.Group("/v1")
 
 	v1.Post("/whatsapp/create-user", r.whatsapp.CreateUser)
+	v1.Put("/whatsapp/update-user/:id", r.whatsapp.UpdateUser)
+	v1.Delete("/whatsapp/delete-user/:id", r.whatsapp.DeleteUser)
+	v1.Get("/whatsapp/users", r.whatsapp.GetWhatsappUser)
+	v1.Get("/whatsapp/user/:id", r.whatsapp.GetWhatsappUserById)
 	whatsapp := v1.Group("/whatsapp", r.whatsapp.UserInfo)
 	whatsapp.Post("/connect", r.whatsapp.Connect)
 	whatsapp.Post("/disconnect", r.whatsapp.Disconnect)

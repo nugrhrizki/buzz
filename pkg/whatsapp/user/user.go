@@ -7,8 +7,8 @@ type User struct {
 	Webhook    string `db:"webhook"    json:"webhook"`
 	Jid        string `db:"jid"        json:"jid"`
 	Qrcode     string `db:"qrcode"     json:"qrcode"`
-	Connected  int    `db:"connected"  json:"connected"`
-	Expiration int    `db:"expiration" json:"expiration"`
+	Connected  *int   `db:"connected"  json:"connected"`
+	Expiration *int   `db:"expiration" json:"expiration"`
 	Events     string `db:"events"     json:"events"`
 }
 

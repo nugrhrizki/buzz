@@ -24,9 +24,9 @@ export function menu(): Menu[] {
           show: true,
         },
         {
-          name: "Client",
+          name: "Sender",
           icon: <TbBrandWhatsapp class="w-5 h-5" />,
-          href: "/client",
+          href: "/sender",
           show: true,
         },
       ],

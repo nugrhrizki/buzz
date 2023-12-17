@@ -55,6 +55,22 @@ func (a *Api) CreateUser(payload *user.User) (*user.User, error) {
 	return &user, nil
 }
 
+func (a *Api) GetUsers() ([]user.User, error) {
+	return a.users.GetUsers()
+}
+
+func (a *Api) GetUserById(id int) (*user.User, error) {
+	return a.users.GetUserById(id)
+}
+
+func (a *Api) DeleteUser(payload *user.User) error {
+	return a.users.DeleteUser(payload)
+}
+
+func (a *Api) UpdateUser(payload *user.User) error {
+	return a.users.UpdateUser(payload)
+}
+
 func (a *Api) Connect(userInfo *user.UserInfo, payload *ConnectPayload) error {
 	txtid := userInfo.Id
 	jid := userInfo.Jid
@@ -216,7 +232,6 @@ func (a *Api) GetQR(userInfo *user.UserInfo) (string, error) {
 		return "", whatsapp.ErrAlreadyLoggedIn
 	}
 
-	a.log.Info().Str("userid", txtid).Str("qrcode", code).Msg("Get QR successful")
 	return code, nil
 }
 
@@ -267,6 +282,10 @@ func (a *Api) GetStatus(userInfo *user.UserInfo) (*GetStatusResponse, error) {
 
 	isConnected := client.IsConnected()
 	isLoggedIn := client.IsLoggedIn()
+
+	if isConnected && isLoggedIn {
+		a.users.SetUserConnected(userid, 1)
+	}
 
 	return &GetStatusResponse{
 		Connected: isConnected,

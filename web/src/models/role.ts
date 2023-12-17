@@ -11,7 +11,7 @@ export const roleSchema = z.object({
 
 export const actionSchema = z.object({
   menu_dashboard: z.boolean().optional(),
-  menu_client: z.boolean().optional(),
+  menu_sender: z.boolean().optional(),
   menu_config_user: z.boolean().optional(),
   menu_config_role: z.boolean().optional(),
   menu_system_flag: z.boolean().optional(),

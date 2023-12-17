@@ -32,7 +32,7 @@ func (r *Repository) CreateRole(role *Role) error {
 	}
 
 	_, err = r.db.Exec(
-		"INSERT INTO roles (name, actions) VALUES (?, ?)",
+		"INSERT INTO roles (name, actions) VALUES ($1, $2)",
 		role.Name,
 		role.Actions,
 	)
@@ -46,7 +46,7 @@ func (r *Repository) GetRoleByRolename(rolename string) (*Role, error) {
 	var role Role
 	err := r.db.Get(
 		&role,
-		"SELECT * FROM roles WHERE name = ? AND deleted_at IS NULL",
+		"SELECT * FROM roles WHERE name = $1 AND deleted_at IS NULL",
 		rolename,
 	)
 	if err != nil {
@@ -59,7 +59,7 @@ func (r *Repository) GetRoleById(id int) (*Role, error) {
 	var role Role
 	err := r.db.Get(
 		&role,
-		"SELECT * FROM roles WHERE id = ? AND deleted_at IS NULL",
+		"SELECT * FROM roles WHERE id = $1 AND deleted_at IS NULL",
 		id,
 	)
 	if err != nil {
@@ -95,11 +95,11 @@ func (r *Repository) UpdateRole(role *Role) error {
 	_, err = r.db.Exec(
 		`UPDATE roles
 		SET
-			name = ?,
-			actions = ?,
+			name = $1,
+			actions = $2,
 			updated_at = CURRENT_TIMESTAMP
 		WHERE
-			id = ?`,
+			id = $3`,
 		role.Name,
 		role.Actions,
 		role.Id,
@@ -112,7 +112,7 @@ func (r *Repository) UpdateRole(role *Role) error {
 
 func (r *Repository) DeleteRole(role *Role) error {
 	_, err := r.db.Exec(
-		"UPDATE roles SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?",
+		"UPDATE roles SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1",
 		role.Id,
 	)
 	if err != nil {
@@ -123,7 +123,7 @@ func (r *Repository) DeleteRole(role *Role) error {
 
 func (r *Repository) HardDeleteRole(role *Role) error {
 	_, err := r.db.Exec(
-		"DELETE FROM roles WHERE id = ?",
+		"DELETE FROM roles WHERE id = $1",
 		role.Id,
 	)
 	if err != nil {

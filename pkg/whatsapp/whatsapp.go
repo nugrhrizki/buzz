@@ -93,7 +93,6 @@ func (w *Whatsapp) ConnectOnStartup() {
 		}
 
 		w.userInfoCache.Set(u.Token, userInfo, cache.NoExpiration)
-		userid, _ := strconv.Atoi(u.Jid)
 		// Gets and set subscription to webhook events
 		eventarray := strings.Split(u.Events, ",")
 
@@ -116,8 +115,8 @@ func (w *Whatsapp) ConnectOnStartup() {
 
 		eventstring := strings.Join(subscribedEvents, ",")
 		w.log.Info().Str("events", eventstring).Str("jid", u.Jid).Msg("Attempt to connect")
-		w.killchannel[userid] = make(chan bool)
-		go w.StartClient(userid, u.Jid, u.Token, subscribedEvents)
+		w.killchannel[u.Id] = make(chan bool)
+		go w.StartClient(u.Id, u.Jid, u.Token, subscribedEvents)
 	}
 }
 

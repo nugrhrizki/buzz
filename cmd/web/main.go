@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/contrib/fiberzerolog"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/rs/zerolog"
 	"go.uber.org/fx"
@@ -33,6 +34,7 @@ var (
 	prefork = flag.Bool("prefork", false, "enable prefork")
 	port    = flag.Int("port", 3000, "port to listen on")
 	tz      = flag.String("tz", "Asia/Jakarta", "timezone")
+	dev     = flag.Bool("dev", false, "enable development mode")
 )
 
 func server(
@@ -57,6 +59,15 @@ func server(
 	app.Use(fiberzerolog.New(fiberzerolog.Config{
 		Logger: log,
 	}))
+	if *dev {
+		log.Info().Msg("development mode enabled")
+		app.Use(cors.New(cors.Config{
+			AllowOrigins:     "http://localhost:5173",
+			AllowCredentials: true,
+		}))
+	} else {
+		log.Info().Msg("development mode disabled")
+	}
 
 	router.Setup(app)
 

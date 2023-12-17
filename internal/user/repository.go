@@ -32,7 +32,7 @@ func (r *Repository) CreateUser(user *User) error {
 	}
 
 	_, err = r.db.Exec(
-		"INSERT INTO users (name, username, password, role_id) VALUES (?, ?, ?, ?)",
+		"INSERT INTO users (name, username, password, role_id) VALUES ($1, $2, $3, $4)",
 		user.Name,
 		user.Username,
 		user.Password,
@@ -48,7 +48,7 @@ func (r *Repository) GetUserByUsername(username string) (*User, error) {
 	var user User
 	err := r.db.Get(
 		&user,
-		"SELECT * FROM users WHERE username = ? AND deleted_at IS NULL",
+		"SELECT * FROM users WHERE username = $1 AND deleted_at IS NULL",
 		username,
 	)
 	if err != nil {
@@ -61,7 +61,7 @@ func (r *Repository) GetUserById(id int) (*User, error) {
 	var user User
 	err := r.db.Get(
 		&user,
-		"SELECT * FROM users WHERE id = ? AND deleted_at IS NULL",
+		"SELECT * FROM users WHERE id = $1 AND deleted_at IS NULL",
 		id,
 	)
 	if err != nil {
@@ -97,16 +97,16 @@ func (r *Repository) UpdateUser(user *User) error {
 	_, err = r.db.Exec(
 		`UPDATE users
 		SET
-			name = ?,
-			username = ?,
-			password = ?,
-			confirmed = ?,
-			whatsapp = ?,
-			email = ?,
-			role_id = ?
+			name = $1,
+			username = $2,
+			password = $3,
+			confirmed = $4,
+			whatsapp = $5,
+			email = $6,
+			role_id = $7
 			updated_at = CURRENT_TIMESTAMP
 		WHERE
-			id = ?`,
+			id = $8`,
 		user.Name,
 		user.Username,
 		user.Password,
@@ -124,7 +124,7 @@ func (r *Repository) UpdateUser(user *User) error {
 
 func (r *Repository) DeleteUser(user *User) error {
 	_, err := r.db.Exec(
-		"UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?",
+		"UPDATE users SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1",
 		user.Id,
 	)
 	if err != nil {
@@ -135,7 +135,7 @@ func (r *Repository) DeleteUser(user *User) error {
 
 func (r *Repository) HardDeleteUser(user *User) error {
 	_, err := r.db.Exec(
-		"DELETE FROM users WHERE id = ?",
+		"DELETE FROM users WHERE id = $1",
 		user.Id,
 	)
 	if err != nil {

@@ -8,7 +8,7 @@ type Env struct {
 func New() *Env {
 	return &Env{
 		DB_DRIVER: "postgres",
-		DB_DSN:    "user=postgres password=postgres dbname=db_whatsapp sslmode=disable",
+		DB_DSN:    "user=postgres password=localdb dbname=db_whatsapp sslmode=disable",
 	}
 }
 

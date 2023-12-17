@@ -104,6 +104,7 @@ func (c *Client) EventHandler(rawEvt interface{}) {
 		} else {
 			c.whatsapp.log.Info().Msg("Marked self as available")
 		}
+		c.whatsapp.log.Info().Msg("Setting up status connection")
 		err = c.whatsapp.users.SetUserConnected(c.userID, 1)
 		if err != nil {
 			c.whatsapp.log.Error().Err(err).Msg("Failed to set user connected")

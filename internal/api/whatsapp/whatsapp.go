@@ -1,6 +1,7 @@
 package whatsapp
 
 import (
+	"errors"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -37,10 +38,9 @@ func (w *WhatsappAPI) UserInfo(c *fiber.Ctx) error {
 
 	if !found {
 		w.log.Info().Msg("Looking for user information in DB")
-		// Checks DB from matching user and store user values in context
-
 		user, err := w.user.GetUserByToken(token)
 		if err != nil {
+			w.log.Error().Err(err).Msg("failed to get user by token")
 			return err
 		}
 
@@ -52,6 +52,7 @@ func (w *WhatsappAPI) UserInfo(c *fiber.Ctx) error {
 
 	userid, err := strconv.Atoi(userInfo.Id)
 	if err != nil {
+		w.log.Error().Err(err).Msg("failed to convert user id to int")
 		return err
 	}
 
@@ -66,12 +67,78 @@ func (w *WhatsappAPI) UserInfo(c *fiber.Ctx) error {
 func (wa *WhatsappAPI) CreateUser(c *fiber.Ctx) error {
 	payload := new(user.User)
 	if err := c.BodyParser(payload); err != nil {
-		return err
+		return errors.New("failed to parse body")
 	}
 
 	_, err := wa.api.CreateUser(payload)
 	if err != nil {
+		return errors.New("failed to create user")
+	}
+
+	return nil
+}
+
+func (wa *WhatsappAPI) GetWhatsappUser(c *fiber.Ctx) error {
+	user, err := wa.api.GetUsers()
+	if err != nil {
 		return err
+	}
+
+	return c.JSON(user)
+}
+
+func (wa *WhatsappAPI) GetWhatsappUserById(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return errors.New("failed to convert id to int")
+	}
+
+	user, err := wa.api.GetUserById(id)
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(user)
+}
+
+func (wa *WhatsappAPI) UpdateUser(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return errors.New("failed to convert id to int")
+	}
+
+	payload := new(user.User)
+	if err := c.BodyParser(payload); err != nil {
+		return errors.New("failed to parse body")
+	}
+
+	user, err := wa.api.GetUserById(id)
+	if err != nil {
+		return errors.New("failed to get user by id")
+	}
+
+	user.Name = payload.Name
+
+	if err := wa.api.UpdateUser(user); err != nil {
+		return errors.New("failed to update user")
+	}
+
+	return nil
+}
+
+func (wa *WhatsappAPI) DeleteUser(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return errors.New("failed to convert id to int")
+	}
+
+	user, err := wa.api.GetUserById(id)
+	if err != nil {
+		return errors.New("failed to get user by id")
+	}
+
+	if err := wa.api.DeleteUser(user); err != nil {
+		return errors.New("failed to delete user")
 	}
 
 	return nil
@@ -87,10 +154,23 @@ func (wa *WhatsappAPI) Connect(c *fiber.Ctx) error {
 
 	err := wa.api.Connect(&userInfo, payload)
 	if err != nil {
-		return err
+		return c.JSON(fiber.Map{
+			"success": false,
+			"message": "failed to connect",
+			"error":   err.Error(),
+		})
 	}
 
-	return nil
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "success connect",
+		"data": fiber.Map{
+			"webhook": userInfo.Webhook,
+			"jid":     userInfo.Jid,
+			"events":  userInfo.Events,
+			"details": "connected",
+		},
+	})
 }
 
 func (wa *WhatsappAPI) Disconnect(c *fiber.Ctx) error {
@@ -140,7 +220,8 @@ func (wa *WhatsappAPI) GetQR(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"qrcode": qrcode,
+		"success": true,
+		"qrcode":  qrcode,
 	})
 }
 
@@ -160,11 +241,17 @@ func (wa *WhatsappAPI) GetStatus(c *fiber.Ctx) error {
 
 	status, err := wa.api.GetStatus(&userInfo)
 	if err != nil {
-		return err
+		return c.JSON(fiber.Map{
+			"success": false,
+			"message": "failed to get status",
+			"error":   err.Error(),
+		})
 	}
 
 	return c.JSON(fiber.Map{
-		"status": status,
+		"success": true,
+		"message": "success get status",
+		"data":    status,
 	})
 }
 
@@ -384,7 +471,8 @@ func (wa *WhatsappAPI) GetContacts(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(contacts)
+	c.Response().Header.Set("Content-Type", "application/json")
+	return c.Send(contacts)
 }
 
 func (wa *WhatsappAPI) SendChatPresence(c *fiber.Ctx) error {

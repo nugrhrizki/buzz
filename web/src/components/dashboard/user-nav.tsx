@@ -1,6 +1,8 @@
 import { As } from "@kobalte/core";
 import { useNavigate } from "@solidjs/router";
 
+import { generateAvatarUrl } from "@/lib/utils";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,7 +23,14 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <As component={Button} variant="ghost" class="relative h-8 w-8 rounded-full">
           <Avatar class="h-8 w-8">
-            <AvatarImage src="https://github.com/nugrhrizki.png" alt="@mangiki" />
+            <AvatarImage
+              src={generateAvatarUrl({
+                name: "nugrhrizki",
+                style: "big-smile",
+                backgroundColors: ["#d6e6ff", "#d7f9f8", "#ffffea", "#fff0d4", "#fbe0e0", "#e5d4ef"],
+              })}
+              alt="@mangiki"
+            />
             <AvatarFallback>MI</AvatarFallback>
           </Avatar>
         </As>

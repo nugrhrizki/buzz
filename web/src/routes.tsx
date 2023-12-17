@@ -8,7 +8,8 @@ import BaseLayout from "@/layout/base";
 const LoginPage = lazy(() => import("@/pages/login"));
 
 const DashboardPage = lazy(() => import("@/pages/dashboard"));
-const ClientPage = lazy(() => import("@/pages/client"));
+const SenderPage = lazy(() => import("@/pages/sender"));
+const SenderDetailPage = lazy(() => import("@/pages/sender/detail"));
 
 const ConfigPage = lazy(() => import("@/pages/config"));
 const UserPage = lazy(() => import("@/pages/config/user"));
@@ -26,7 +27,8 @@ export function Routes() {
     <HashRouter root={BaseLayout}>
       <Route path="/" component={AdminLayout}>
         <Route path="/" component={DashboardPage} />
-        <Route path="/client" component={ClientPage} />
+        <Route path="/sender" component={SenderPage} />
+        <Route path="/sender/:id" component={SenderDetailPage} />
 
         <Route path="/config" component={ConfigPage} />
         <Route path="/config/user" component={UserPage} />
