@@ -33,7 +33,7 @@ function AdminLayout(props: ParentProps) {
         <Header>
           <div class="flex h-16 items-center gap-x-4 px-4">
             <Button variant="ghost" size="icon" onClick={toggleSidebarPin}>
-              <Show when={sidebarPin()} fallback={<CgMenu />}>
+              <Show when={sidebarPin()} fallback={<CgMenu class="w-5 h-5" />}>
                 <CgMenuLeftAlt class="w-5 h-5" />
               </Show>
             </Button>
