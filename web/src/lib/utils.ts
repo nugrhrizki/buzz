@@ -58,3 +58,14 @@ export function generateAvatarUrl(options: AvatarOptions) {
   }
   return `https://api.dicebear.com/7.x/${options.style || "notionists"}/svg?${params.toString()}`;
 }
+
+export function formatDate(date: Date | string | number) {
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}

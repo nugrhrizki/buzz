@@ -6,7 +6,11 @@
   "semi": true,
   "bracketSameLine": true,
   "importOrder": [
+    "^@/types$",
+    "^@/assets/(.*)$",
     "^@/lib/(.*)$",
+    "^@/actions$",
+    "^@/actions/(.*)$",
     "^@/services/(.*)$",
     "^@/queries/(.*)$",
     "^@/context/(.*)$",
