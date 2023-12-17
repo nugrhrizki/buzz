@@ -104,6 +104,17 @@ function switchThemeAction(ctx: ActionCtx) {
   ];
 }
 
+function logoutAction(ctx: ActionCtx) {
+  return {
+    id: "Logout",
+    title: "Logout",
+    mdIcon: "logout",
+    handler: () => {
+      ctx.navigate("/auth");
+    },
+  };
+}
+
 export function actions(ctx: ActionCtx) {
-  return [...menuAction(ctx), toggleSidebarAction, ...switchThemeAction(ctx)];
+  return [...menuAction(ctx), toggleSidebarAction, ...switchThemeAction(ctx), logoutAction(ctx)];
 }

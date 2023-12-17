@@ -16,8 +16,8 @@ export function ModeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <As component={Button} variant="ghost" size="sm">
-          <TbSun class="rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <TbMoon class="absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <TbSun class="w-5 h-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <TbMoon class="w-5 h-5 absolute rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span class="sr-only">Toggle theme</span>
         </As>
       </DropdownMenuTrigger>

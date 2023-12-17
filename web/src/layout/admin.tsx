@@ -34,11 +34,11 @@ function AdminLayout(props: ParentProps) {
           <div class="flex h-16 items-center gap-x-4 px-4">
             <Button variant="ghost" size="icon" onClick={toggleSidebarPin}>
               <Show when={sidebarPin()} fallback={<CgMenu />}>
-                <CgMenuLeftAlt />
+                <CgMenuLeftAlt class="w-5 h-5" />
               </Show>
             </Button>
             <Button variant="ghost" size="icon" onClick={() => open()}>
-              <TbSearch />
+              <TbSearch class="w-5 h-5" />
             </Button>
             <div class="ml-auto flex items-center space-x-4">
               <ModeToggle />
