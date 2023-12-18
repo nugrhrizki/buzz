@@ -3,17 +3,17 @@ package user
 import "time"
 
 type User struct {
-	Id        int64     `json:"id"         db:"id"`
-	Name      string    `json:"name"       db:"name"`
-	Username  string    `json:"username"   db:"username"`
-	Password  string    `json:"password"   db:"password"`
-	Confirmed bool      `json:"confirmed"  db:"confirmed"`
-	Whatsapp  string    `json:"whatsapp"   db:"whatsapp"`
-	Email     string    `json:"email"      db:"email"`
-	RoleId    int64     `json:"role_id"    db:"role_id"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
-	DeletedAt time.Time `json:"deleted_at" db:"deleted_at"`
+	Id        int64      `json:"id"         db:"id"`
+	Name      string     `json:"name"       db:"name"`
+	Username  string     `json:"username"   db:"username"`
+	Password  string     `json:"password"   db:"password"`
+	Confirmed bool       `json:"confirmed"  db:"confirmed"`
+	Whatsapp  *string    `json:"whatsapp"   db:"whatsapp"`
+	Email     *string    `json:"email"      db:"email"`
+	RoleId    int64      `json:"role_id"    db:"role_id"`
+	CreatedAt time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at" db:"deleted_at"`
 }
 
 func New() string {

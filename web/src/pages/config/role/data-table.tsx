@@ -44,11 +44,11 @@ export const columns: ColumnDefiniton[] = [
     accessorKey: "updated_at",
     header: (header) => <DataTable.ColumnHeader column={header.column} title="Updated At" />,
     cell: (cell) => {
-      if (!cell.row.original.created_at) {
+      if (!cell.row.original.updated_at) {
         return "-";
       }
 
-      return formatDate(cell.row.original.created_at);
+      return formatDate(cell.row.original.updated_at);
     },
   },
 ];

@@ -1,8 +1,20 @@
-import { ParentProps } from "solid-js";
+import { useNavigate } from "@solidjs/router";
+import { ParentProps, createEffect } from "solid-js";
 
 import levitate from "@/assets/levitate.svg";
 
+import { useUser } from "@/services/auth";
+
 function AuthLayout(props: ParentProps) {
+  const navigate = useNavigate();
+  const user = useUser();
+
+  createEffect(() => {
+    if (user.status === "success") {
+      navigate("/", { replace: true });
+    }
+  });
+
   return (
     <div class="relative h-[100dvh] flex items-center">
       <div class="absolute left-0 top-0 flex gap-x-2 p-4">

@@ -3,12 +3,12 @@ package role
 import "time"
 
 type Role struct {
-	Id        int64     `json:"id"         db:"id"`
-	Name      string    `json:"name"       db:"name"`
-	Actions   string    `json:"actions"    db:"actions"`
-	CreatedAt time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
-	DeletedAt time.Time `json:"deleted_at" db:"deleted_at"`
+	Id        int64      `json:"id"         db:"id"`
+	Name      string     `json:"name"       db:"name"`
+	Actions   string     `json:"actions"    db:"actions"`
+	CreatedAt time.Time  `json:"created_at" db:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at" db:"deleted_at"`
 }
 
 func New() string {

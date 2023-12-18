@@ -3,6 +3,8 @@ import { ColorModeProvider, ColorModeScript } from "@kobalte/core";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { render } from "solid-js/web";
 
+import { Toaster } from "@/components/ui/toast";
+
 import "./root.css";
 import { Routes } from "./routes";
 
@@ -21,6 +23,7 @@ render(
       <ColorModeProvider>
         <Routes />
       </ColorModeProvider>
+      <Toaster />
     </QueryClientProvider>
   ),
   document.getElementById("root")!,

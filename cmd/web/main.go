@@ -18,10 +18,12 @@ import (
 	"github.com/nugrhrizki/buzz/pkg/database"
 	"github.com/nugrhrizki/buzz/pkg/env"
 	"github.com/nugrhrizki/buzz/pkg/log"
+	"github.com/nugrhrizki/buzz/pkg/password"
 	"github.com/nugrhrizki/buzz/pkg/whatsapp"
 	whatsappApi "github.com/nugrhrizki/buzz/pkg/whatsapp/api"
 	whatsappUser "github.com/nugrhrizki/buzz/pkg/whatsapp/user"
 
+	authHandler "github.com/nugrhrizki/buzz/internal/api/auth"
 	roleHandler "github.com/nugrhrizki/buzz/internal/api/role"
 	userHandler "github.com/nugrhrizki/buzz/internal/api/user"
 	whatsappHandler "github.com/nugrhrizki/buzz/internal/api/whatsapp"
@@ -48,6 +50,7 @@ func server(
 	log *zerolog.Logger,
 ) *fiber.App {
 	db.Migrate(users, role, user)
+	db.Seeder(role, user)
 
 	app := fiber.New(fiber.Config{
 		Prefork: *prefork,
@@ -101,8 +104,10 @@ func main() {
 
 			role.NewRepository,
 			user.NewRepository,
+			password.NewPassword,
 			whatsappUser.NewRepository,
 
+			authHandler.NewAuthApi,
 			roleHandler.NewRoleApi,
 			userHandler.NewUserApi,
 			whatsappHandler.NewWhatsappAPI,

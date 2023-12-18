@@ -1,11 +1,14 @@
 package routes
 
 import (
+	jwtware "github.com/gofiber/contrib/jwt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/nugrhrizki/buzz/internal/api/auth"
 	"github.com/nugrhrizki/buzz/internal/api/role"
 	"github.com/nugrhrizki/buzz/internal/api/user"
 	"github.com/nugrhrizki/buzz/internal/api/whatsapp"
+	"github.com/nugrhrizki/buzz/pkg/env"
 	"github.com/nugrhrizki/buzz/web"
 )
 
@@ -13,27 +16,44 @@ type Router struct {
 	whatsapp *whatsapp.WhatsappAPI
 	user     *user.UserApi
 	role     *role.RoleApi
+	auth     *auth.AuthApi
+	env      *env.Env
 }
 
 func New(
 	whatsapp *whatsapp.WhatsappAPI,
 	user *user.UserApi,
 	role *role.RoleApi,
+	auth *auth.AuthApi,
+	env *env.Env,
 ) *Router {
 	return &Router{
 		whatsapp: whatsapp,
 		user:     user,
 		role:     role,
+		auth:     auth,
+		env:      env,
 	}
 }
 
 func (r *Router) Setup(app *fiber.App) {
+	authMiddleware := jwtware.New(jwtware.Config{
+		SigningKey:  jwtware.SigningKey{Key: []byte(r.env.Secret)},
+		TokenLookup: "cookie:auth-token",
+	})
+
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.SendString("healthy")
 	})
 
 	api := app.Group("/api")
 	v1 := api.Group("/v1")
+
+	auth := v1.Group("/auth")
+	auth.Post("/login", r.auth.Login)
+	auth.Post("/register", authMiddleware, r.auth.CreateUser)
+	auth.Post("/logout", authMiddleware, r.auth.Logout)
+	auth.Get("/identify", authMiddleware, r.auth.IdentifyUser)
 
 	v1.Post("/whatsapp/create-user", r.whatsapp.CreateUser)
 	v1.Put("/whatsapp/update-user/:id", r.whatsapp.UpdateUser)
@@ -64,19 +84,19 @@ func (r *Router) Setup(app *fiber.App) {
 	whatsapp.Post("/contacts", r.whatsapp.GetContacts)
 	whatsapp.Post("/send-chat-presence", r.whatsapp.SendChatPresence)
 
-	user := v1.Group("/user")
+	user := v1.Group("/user", authMiddleware)
 	user.Post("/create", r.user.CreateUser)
 	user.Post("/get", r.user.GetUser)
 	user.Get("/get-all", r.user.GetUsers)
-	user.Put("/update", r.user.UpdateUser)
-	user.Delete("/delete", r.user.DeleteUser)
+	user.Put("/update/:id", r.user.UpdateUser)
+	user.Delete("/delete/:id", r.user.DeleteUser)
 
-	role := v1.Group("/role")
+	role := v1.Group("/role", authMiddleware)
 	role.Post("/create", r.role.CreateRole)
 	role.Post("/get", r.role.GetRole)
 	role.Get("/get-all", r.role.GetRoles)
-	role.Put("/update", r.role.UpdateRole)
-	role.Delete("/delete", r.role.DeleteRole)
+	role.Put("/update/:id", r.role.UpdateRole)
+	role.Delete("/delete/:id", r.role.DeleteRole)
 
 	app.Get("/*", filesystem.New(filesystem.Config{
 		Root:   web.Dist(),

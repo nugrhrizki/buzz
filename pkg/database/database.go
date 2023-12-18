@@ -14,15 +14,10 @@ type Database struct {
 	log *zerolog.Logger
 }
 
-type Seed struct {
-	Schema string
-	Data   interface{}
-}
-
 func New(env *env.Env, log *zerolog.Logger) *Database {
 	db, err := sqlx.Connect(
-		env.GetDBDriver(),
-		env.GetDBDSN(),
+		env.DB_DRIVER,
+		env.DB_DSN,
 	)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to connect to database")
@@ -90,10 +85,14 @@ func (d *Database) Migrate(migration ...Migrate) {
 	}
 }
 
-func (d *Database) Seeder(seeds []Seed) {
+type Seeder interface {
+	Seed() error
+}
+
+func (d *Database) Seeder(seeds ...Seeder) {
 	for _, seed := range seeds {
-		if _, err := d.DB.NamedExec(seed.Schema, seed.Data); err != nil {
-			d.log.Fatal().Err(err).Msg("failed to seed")
+		if err := seed.Seed(); err != nil {
+			d.log.Warn().Err(err).Msg("failed to seed")
 		}
 	}
 }

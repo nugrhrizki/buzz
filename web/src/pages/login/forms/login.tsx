@@ -3,27 +3,38 @@ import { useNavigate } from "@solidjs/router";
 import { TbLoader } from "solid-icons/tb";
 import { Show } from "solid-js";
 
+import { useLoginUser } from "@/services/auth";
+
 import { Button } from "@/components/ui/button";
 import { Grid } from "@/components/ui/grid";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { showToast } from "@/components/ui/toast";
 
 import { type AuthForm, authFormSchema } from "../validations/auth";
 
 export function LoginForm() {
   const navigate = useNavigate();
+  const login = useLoginUser();
   const [authForm, { Form, Field }] = createForm<AuthForm>({
     validate: zodForm(authFormSchema),
   });
 
-  function handleSubmit(auth: AuthForm) {
-    return new Promise((resolve) =>
-      setTimeout(() => {
-        console.log(auth);
+  async function handleSubmit(auth: AuthForm) {
+    login.mutate(auth, {
+      onSuccess: () => {
         navigate("/", { replace: true });
-        resolve(true);
-      }, 2000),
-    );
+      },
+      onError: async (error) => {
+        const response = error as unknown as Response;
+        const data = await response.json();
+        showToast({
+          title: "Failed to login",
+          description: data.message,
+          variant: "destructive",
+        });
+      },
+    });
   }
 
   return (

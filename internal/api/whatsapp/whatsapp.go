@@ -216,7 +216,11 @@ func (wa *WhatsappAPI) GetQR(c *fiber.Ctx) error {
 
 	qrcode, err := wa.api.GetQR(&userInfo)
 	if err != nil {
-		return err
+		return c.JSON(fiber.Map{
+			"success": false,
+			"message": "failed to get qrcode",
+			"error":   err.Error(),
+		})
 	}
 
 	return c.JSON(fiber.Map{

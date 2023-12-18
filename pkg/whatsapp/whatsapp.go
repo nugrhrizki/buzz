@@ -51,8 +51,8 @@ func New(
 	env *env.Env,
 ) *Whatsapp {
 	container, err := sqlstore.New(
-		env.GetDBDriver(),
-		env.GetDBDSN(),
+		env.DB_DRIVER,
+		env.DB_DSN,
 		nil,
 	)
 

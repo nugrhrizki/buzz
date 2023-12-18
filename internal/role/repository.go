@@ -19,6 +19,34 @@ func (r *Repository) Migration() string {
 	return New()
 }
 
+func (r *Repository) createRole() error {
+	newUser := Role{
+		Name:    "Super Admin",
+		Actions: "{}",
+	}
+
+	if err := r.CreateRole(&newUser); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) Seed() error {
+	roles := []Role{}
+	if err := r.db.DB.Select(&roles, "SELECT * FROM roles ORDER BY id ASC LIMIT 1"); err != nil {
+		if err == sql.ErrNoRows {
+			return r.createRole()
+		}
+	}
+
+	if len(roles) == 0 {
+		return r.createRole()
+	}
+
+	return nil
+}
+
 func (r *Repository) CreateRole(role *Role) error {
 	_, err := r.GetRoleByRolename(role.Name)
 

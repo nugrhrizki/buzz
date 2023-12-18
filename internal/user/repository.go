@@ -5,18 +5,55 @@ import (
 	"errors"
 
 	"github.com/nugrhrizki/buzz/pkg/database"
+	"github.com/nugrhrizki/buzz/pkg/password"
 )
 
 type Repository struct {
-	db *database.Database
+	db       *database.Database
+	password *password.Password
 }
 
-func NewRepository(db *database.Database) *Repository {
-	return &Repository{db}
+func NewRepository(db *database.Database, password *password.Password) *Repository {
+	return &Repository{db, password}
 }
 
 func (r *Repository) Migration() string {
 	return New()
+}
+
+func (r *Repository) createUser() error {
+	hashedPassword, err := r.password.GenerateHashPassword("rahasia")
+	if err != nil {
+		return err
+	}
+
+	newUser := User{
+		Name:     "Super Admin",
+		Username: "sadmin",
+		Password: hashedPassword,
+		RoleId:   1,
+	}
+
+	if err := r.CreateUser(&newUser); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *Repository) Seed() error {
+	users := []User{}
+	if err := r.db.DB.Select(&users, "SELECT * FROM users ORDER BY id ASC LIMIT 1"); err != nil {
+		if err == sql.ErrNoRows {
+			return r.createUser()
+		}
+	}
+
+	if len(users) == 0 {
+		return r.createUser()
+	}
+
+	return nil
 }
 
 func (r *Repository) CreateUser(user *User) error {
@@ -74,7 +111,7 @@ func (r *Repository) GetUsers() ([]User, error) {
 	var users []User
 	err := r.db.Select(
 		&users,
-		"SELECT * FROM users AND deleted_at IS NULL",
+		"SELECT * FROM users WHERE deleted_at IS NULL",
 	)
 	if err != nil {
 		return nil, err
